@@ -156,12 +156,6 @@
     font-family: 'Playfair Display', serif;
     color: var(--rose-light);
     font-size: 22px;
-    margin-bottom: 8px;
-  }
-  .music-popup-text {
-    color: rgba(253,246,240,0.72);
-    font-size: 15px;
-    line-height: 1.5;
     margin-bottom: 16px;
   }
   .music-popup-play {
@@ -847,6 +841,131 @@
     100% { opacity: 0; transform: translateY(-200px); }
   }
 
+  /* ===== BIRTHDAY CANDLES ===== */
+  #birthday {
+    background: radial-gradient(ellipse at 50% 0%, #441425 0%, #12050b 62%);
+    text-align: center;
+    overflow: hidden;
+  }
+  .birthday-container {
+    width: min(980px, 100%);
+    z-index: 10;
+    position: relative;
+  }
+  .birthday-title {
+    font-family: 'Dancing Script', cursive;
+    font-size: clamp(48px, 8vw, 92px);
+    color: var(--rose-light);
+    line-height: 1.1;
+    margin-bottom: 12px;
+    text-shadow: 0 0 36px rgba(200,80,106,0.4);
+  }
+  .birthday-note {
+    color: rgba(253,246,240,0.72);
+    font-size: 18px;
+    letter-spacing: 1px;
+    margin-bottom: 38px;
+  }
+  .cake-plate {
+    width: min(720px, 96vw);
+    margin: 0 auto;
+    padding: 26px 20px 34px;
+    border-radius: 8px;
+    background:
+      linear-gradient(180deg, rgba(253,246,240,0.12), rgba(253,246,240,0.04)),
+      radial-gradient(ellipse at 50% 100%, rgba(212,168,83,0.18), transparent 62%);
+    border: 1px solid rgba(244,167,184,0.2);
+  }
+  .candles {
+    display: grid;
+    grid-template-columns: repeat(7, minmax(26px, 1fr));
+    gap: 30px 18px;
+    align-items: end;
+    justify-items: center;
+    margin-bottom: 18px;
+  }
+  .candle {
+    width: 24px;
+    height: 86px;
+    border-radius: 8px 8px 4px 4px;
+    position: relative;
+    background:
+      repeating-linear-gradient(45deg, rgba(255,255,255,0.9) 0 7px, rgba(244,167,184,0.95) 7px 14px);
+    box-shadow: inset -5px 0 10px rgba(139,42,64,0.25), 0 10px 22px rgba(0,0,0,0.24);
+    cursor: pointer;
+  }
+  .candle::before {
+    content: "";
+    position: absolute;
+    top: -8px;
+    left: 50%;
+    width: 2px;
+    height: 10px;
+    transform: translateX(-50%);
+    background: #2d1118;
+    border-radius: 2px;
+  }
+  .flame {
+    position: absolute;
+    top: -34px;
+    left: 50%;
+    width: 18px;
+    height: 28px;
+    transform: translateX(-50%);
+    transform-origin: 50% 90%;
+    border-radius: 50% 50% 45% 45%;
+    background: radial-gradient(circle at 50% 68%, #fff7b2 0 18%, #ffd166 32%, #ff7a3d 65%, rgba(255,122,61,0) 72%);
+    filter: drop-shadow(0 0 12px rgba(255,190,80,0.9));
+    animation: flame-flicker 0.16s infinite alternate ease-in-out;
+  }
+  @keyframes flame-flicker {
+    from { transform: translateX(-50%) rotate(-4deg) scaleY(0.94); }
+    to { transform: translateX(-50%) rotate(5deg) scaleY(1.08); }
+  }
+  .candles.blown .flame {
+    animation: flame-out 0.55s forwards ease-in;
+  }
+  @keyframes flame-out {
+    0% { opacity: 1; transform: translateX(-50%) scale(1); filter: drop-shadow(0 0 12px rgba(255,190,80,0.9)); }
+    100% { opacity: 0; transform: translateX(-50%) translateY(-14px) scale(0.1); filter: drop-shadow(0 0 0 transparent); }
+  }
+  .cake-base {
+    height: 86px;
+    border-radius: 8px;
+    background:
+      linear-gradient(180deg, #f4a7b8 0 28%, #c8506a 28% 72%, #8b2a40 72%),
+      radial-gradient(circle, rgba(253,246,240,0.28) 0 3px, transparent 4px);
+    box-shadow: 0 18px 46px rgba(0,0,0,0.35);
+  }
+  .birthday-message {
+    min-height: 58px;
+    margin-top: 28px;
+    font-family: 'Dancing Script', cursive;
+    font-size: clamp(34px, 6vw, 66px);
+    color: var(--gold-light);
+    opacity: 0;
+    transform: translateY(18px);
+    transition: opacity 0.7s ease, transform 0.7s ease;
+    text-shadow: 0 0 32px rgba(212,168,83,0.35);
+  }
+  .birthday-message.show {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  .birthday-pop {
+    position: fixed;
+    left: 0;
+    top: 0;
+    z-index: 1200;
+    pointer-events: none;
+    font-size: 22px;
+    animation: birthday-pop 2.8s ease-out forwards;
+  }
+  @keyframes birthday-pop {
+    0% { opacity: 1; transform: translate(0,0) scale(0.8) rotate(0deg); }
+    100% { opacity: 0; transform: translate(var(--x), var(--y)) scale(1.2) rotate(var(--r)); }
+  }
+
   /* ===== OUTRO ===== */
   #outro {
     background: radial-gradient(ellipse at 50% 100%, #3d0a1e 0%, #0a0306 60%);
@@ -893,6 +1012,10 @@
     .konya-grid { grid-template-columns: 1fr; }
     .konya-visual { height: 250px; }
     .letter-paper { padding: 40px 24px; }
+    .candles { grid-template-columns: repeat(7, minmax(20px, 1fr)); gap: 26px 10px; }
+    .candle { width: 18px; height: 70px; }
+    .flame { width: 15px; height: 24px; top: -30px; }
+    .cake-base { height: 68px; }
     section { padding: 80px 20px; }
   }
 </style>
@@ -918,8 +1041,7 @@
 
 <div class="music-popup" id="music-popup">
   <button class="music-popup-close" onclick="closeMusicPopup()" aria-label="Müzik penceresini kapat">×</button>
-  <p class="music-popup-title">Müziği başlat</p>
-  <p class="music-popup-text">Tarayıcı sesli müziği otomatik başlatmıyor. Bir kez dokun, popup kapansa bile şarkı devam etsin.</p>
+  <p class="music-popup-title">Bu bizim ikimizin şarkısı</p>
   <button class="music-popup-play" onclick="startMusic()">Şarkıyı Oynat ♪</button>
 </div>
 
@@ -931,7 +1053,10 @@
   <div class="nav-dot" onclick="scrollToSection(3)" title="Anılar"></div>
   <div class="nav-dot" onclick="scrollToSection(4)" title="Geri sayım"></div>
   <div class="nav-dot" onclick="scrollToSection(5)" title="Mektup"></div>
-  <div class="nav-dot" onclick="scrollToSection(6)" title="Dilek balonları"></div>
+  <div class="nav-dot" onclick="scrollToSection(6)" title="Sevgi sayıları"></div>
+  <div class="nav-dot" onclick="scrollToSection(7)" title="Dilek balonları"></div>
+  <div class="nav-dot" onclick="scrollToSection(8)" title="Seni seviyorum"></div>
+  <div class="nav-dot" onclick="scrollToSection(9)" title="Doğum günü"></div>
 </div>
 
 <!-- ===== HERO ===== -->
@@ -1215,7 +1340,43 @@
   </div>
 </section>
 
-<!-- Audio via YouTube nocookie embed (no ads) -->
+<!-- ===== BIRTHDAY ===== -->
+<section id="birthday">
+  <div class="birthday-container">
+    <p class="section-label">Doğum günün</p>
+    <h2 class="birthday-title">21 Mum</h2>
+    <p class="birthday-note">Bir dilek tut ve mumlara dokun.</p>
+    <div class="cake-plate" onclick="blowCandles()">
+      <div class="candles" id="candles">
+        <div class="candle"><span class="flame"></span></div>
+        <div class="candle"><span class="flame"></span></div>
+        <div class="candle"><span class="flame"></span></div>
+        <div class="candle"><span class="flame"></span></div>
+        <div class="candle"><span class="flame"></span></div>
+        <div class="candle"><span class="flame"></span></div>
+        <div class="candle"><span class="flame"></span></div>
+        <div class="candle"><span class="flame"></span></div>
+        <div class="candle"><span class="flame"></span></div>
+        <div class="candle"><span class="flame"></span></div>
+        <div class="candle"><span class="flame"></span></div>
+        <div class="candle"><span class="flame"></span></div>
+        <div class="candle"><span class="flame"></span></div>
+        <div class="candle"><span class="flame"></span></div>
+        <div class="candle"><span class="flame"></span></div>
+        <div class="candle"><span class="flame"></span></div>
+        <div class="candle"><span class="flame"></span></div>
+        <div class="candle"><span class="flame"></span></div>
+        <div class="candle"><span class="flame"></span></div>
+        <div class="candle"><span class="flame"></span></div>
+        <div class="candle"><span class="flame"></span></div>
+      </div>
+      <div class="cake-base"></div>
+    </div>
+    <p class="birthday-message" id="birthday-message">İyi ki doğdun, iyi ki varsın</p>
+  </div>
+</section>
+
+<!-- Audio via YouTube embed. For guaranteed no-ads playback, replace this with a direct audio file source. -->
 <iframe id="yt-player" src="https://www.youtube-nocookie.com/embed/aNQsM1trwPk?autoplay=0&loop=1&playlist=aNQsM1trwPk&mute=0&enablejsapi=1&rel=0&modestbranding=1&iv_load_policy=3&disablekb=1&playsinline=1" 
   style="position:fixed;width:1px;height:1px;opacity:0;bottom:0;left:0;pointer-events:none;" 
   allow="autoplay; encrypted-media" frameborder="0"></iframe>
@@ -1432,6 +1593,42 @@ function launchWish() {
   setTimeout(() => wish.remove(), 4000);
   input.value = '';
   launchBalloon();
+}
+
+// ===== BIRTHDAY CANDLES =====
+let candlesBlown = false;
+function blowCandles() {
+  if (candlesBlown) return;
+  candlesBlown = true;
+  const candles = document.getElementById('candles');
+  candles.querySelectorAll('.flame').forEach((flame, i) => {
+    flame.style.animationDelay = (i * 0.045) + 's';
+  });
+  candles.classList.add('blown');
+  setTimeout(() => {
+    document.getElementById('birthday-message').classList.add('show');
+    createBirthdayBurst();
+  }, 650);
+}
+
+function createBirthdayBurst() {
+  const symbols = ['💕','💖','💗','🌹','✨','★','✦'];
+  const centerX = window.innerWidth / 2;
+  const centerY = window.innerHeight / 2;
+  for (let i = 0; i < 90; i++) {
+    const pop = document.createElement('span');
+    pop.className = 'birthday-pop';
+    pop.textContent = symbols[Math.floor(Math.random() * symbols.length)];
+    pop.style.left = centerX + 'px';
+    pop.style.top = centerY + 'px';
+    pop.style.setProperty('--x', ((Math.random() - 0.5) * window.innerWidth * 0.9) + 'px');
+    pop.style.setProperty('--y', ((Math.random() - 0.8) * window.innerHeight * 0.75) + 'px');
+    pop.style.setProperty('--r', ((Math.random() * 720) - 360) + 'deg');
+    pop.style.animationDelay = (Math.random() * 0.35) + 's';
+    document.body.appendChild(pop);
+    setTimeout(() => pop.remove(), 3400);
+  }
+  createParticleBurst();
 }
 
 // ===== PARTICLE CANVAS =====
