@@ -82,6 +82,25 @@
     letter-spacing: 2px;
     text-transform: uppercase;
   }
+  .music-control {
+    width: 36px;
+    height: 36px;
+    border: 1px solid rgba(244,167,184,0.45);
+    border-radius: 50%;
+    background: rgba(200,80,106,0.12);
+    color: var(--rose-light);
+    font-size: 18px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.25s ease;
+  }
+  .music-control:hover {
+    border-color: var(--rose-light);
+    background: rgba(200,80,106,0.28);
+    transform: translateY(-1px);
+  }
   .music-bars {
     display: flex;
     align-items: flex-end;
@@ -102,6 +121,60 @@
   @keyframes bar-dance {
     from { height: 4px; opacity: 0.5; }
     to { opacity: 1; }
+  }
+
+  .music-popup {
+    position: fixed;
+    top: 76px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1001;
+    width: min(92vw, 360px);
+    padding: 18px 20px 20px;
+    background: rgba(26,10,16,0.94);
+    border: 1px solid rgba(244,167,184,0.3);
+    border-radius: 8px;
+    box-shadow: 0 24px 80px rgba(0,0,0,0.45);
+    backdrop-filter: blur(14px);
+    text-align: center;
+  }
+  .music-popup.hidden { display: none; }
+  .music-popup-close {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    width: 28px;
+    height: 28px;
+    border: 0;
+    border-radius: 50%;
+    background: transparent;
+    color: rgba(253,246,240,0.65);
+    font-size: 18px;
+    cursor: pointer;
+  }
+  .music-popup-title {
+    font-family: 'Playfair Display', serif;
+    color: var(--rose-light);
+    font-size: 22px;
+    margin-bottom: 8px;
+  }
+  .music-popup-text {
+    color: rgba(253,246,240,0.72);
+    font-size: 15px;
+    line-height: 1.5;
+    margin-bottom: 16px;
+  }
+  .music-popup-play {
+    border: none;
+    border-radius: 40px;
+    background: linear-gradient(135deg, var(--rose-dark), var(--rose));
+    color: white;
+    cursor: pointer;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 17px;
+    letter-spacing: 1px;
+    padding: 11px 28px;
+    box-shadow: 0 12px 32px rgba(200,80,106,0.28);
   }
 
   /* Nav Dots */
@@ -840,7 +913,14 @@
     <div class="music-bar-line"></div>
   </div>
   <span class="music-info">Sen Bana Sın — Çalıyor ♪</span>
-  <span id="music-icon" onclick="toggleMusic()" title="Müziği aç/kapat">🎵</span>
+  <button class="music-control" id="music-icon" onclick="toggleMute()" title="Müziği sustur/aç" aria-label="Müziği sustur veya aç">🔊</button>
+</div>
+
+<div class="music-popup" id="music-popup">
+  <button class="music-popup-close" onclick="closeMusicPopup()" aria-label="Müzik penceresini kapat">×</button>
+  <p class="music-popup-title">Müziği başlat</p>
+  <p class="music-popup-text">Tarayıcı sesli müziği otomatik başlatmıyor. Bir kez dokun, popup kapansa bile şarkı devam etsin.</p>
+  <button class="music-popup-play" onclick="startMusic()">Şarkıyı Oynat ♪</button>
 </div>
 
 <!-- Nav Dots -->
@@ -1136,7 +1216,7 @@
 </section>
 
 <!-- Audio via YouTube nocookie embed (no ads) -->
-<iframe id="yt-player" src="https://www.youtube-nocookie.com/embed/aNQsM1trwPk?autoplay=1&loop=1&playlist=aNQsM1trwPk&mute=0&enablejsapi=1&rel=0&modestbranding=1&iv_load_policy=3&disablekb=1" 
+<iframe id="yt-player" src="https://www.youtube-nocookie.com/embed/aNQsM1trwPk?autoplay=0&loop=1&playlist=aNQsM1trwPk&mute=0&enablejsapi=1&rel=0&modestbranding=1&iv_load_policy=3&disablekb=1&playsinline=1" 
   style="position:fixed;width:1px;height:1px;opacity:0;bottom:0;left:0;pointer-events:none;" 
   allow="autoplay; encrypted-media" frameborder="0"></iframe>
 
@@ -1194,21 +1274,61 @@ function createPetal() {
 setInterval(createPetal, 600);
 
 // ===== MUSIC =====
-let musicPlaying = true;
-function toggleMusic() {
+let musicStarted = false;
+let musicMuted = false;
+const musicPopup = document.getElementById('music-popup');
+const musicStatus = document.querySelector('.music-info');
+
+function sendPlayerCommand(func) {
   const iframe = document.getElementById('yt-player');
-  const icon = document.getElementById('music-icon');
-  if (musicPlaying) {
-    iframe.contentWindow.postMessage('{"event":"command","func":"pauseVideo","args":""}', '*');
-    icon.textContent = '🔇';
-    document.querySelectorAll('.music-bar-line').forEach(b => b.style.animationPlayState = 'paused');
-  } else {
-    iframe.contentWindow.postMessage('{"event":"command","func":"playVideo","args":""}', '*');
-    icon.textContent = '🎵';
-    document.querySelectorAll('.music-bar-line').forEach(b => b.style.animationPlayState = 'running');
-  }
-  musicPlaying = !musicPlaying;
+  if (!iframe || !iframe.contentWindow) return;
+  iframe.contentWindow.postMessage(JSON.stringify({
+    event: 'command',
+    func,
+    args: ''
+  }), '*');
 }
+
+function startMusic() {
+  const iframe = document.getElementById('yt-player');
+  if (!musicStarted && iframe.src.includes('autoplay=0')) {
+    iframe.src = iframe.src.replace('autoplay=0', 'autoplay=1');
+  }
+  musicStarted = true;
+  musicMuted = false;
+  sendPlayerCommand('unMute');
+  sendPlayerCommand('playVideo');
+  setTimeout(() => {
+    sendPlayerCommand('unMute');
+    sendPlayerCommand('playVideo');
+  }, 700);
+  closeMusicPopup();
+  updateMusicUi();
+}
+
+function closeMusicPopup() {
+  musicPopup.classList.add('hidden');
+}
+
+function toggleMute() {
+  if (!musicStarted) {
+    startMusic();
+    return;
+  }
+  musicMuted = !musicMuted;
+  sendPlayerCommand(musicMuted ? 'mute' : 'unMute');
+  updateMusicUi();
+}
+
+function updateMusicUi() {
+  const icon = document.getElementById('music-icon');
+  icon.textContent = !musicStarted ? '🎵' : (musicMuted ? '🔇' : '🔊');
+  musicStatus.textContent = !musicStarted ? 'Sen Bana Sın — Başlat' : (musicMuted ? 'Sen Bana Sın — Sessizde' : 'Sen Bana Sın — Çalıyor ♪');
+  document.querySelectorAll('.music-bar-line').forEach(b => {
+    b.style.animationPlayState = (!musicStarted || musicMuted) ? 'paused' : 'running';
+  });
+}
+updateMusicUi();
 
 // ===== SECTIONS / NAV DOTS =====
 const sections = document.querySelectorAll('section');
