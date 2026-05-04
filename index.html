@@ -1070,7 +1070,7 @@
     </h1>
     <span class="hero-heart">🌹</span>
     <p class="hero-tagline">Telegram'dan başlayan bir masal...</p>
-    <p class="hero-date">11 Haziran 2024 — Sonsuzluğa</p>
+    <p class="hero-date">11 Haziran 2025 — Sonsuzluğa</p>
   </div>
   <div class="scroll-hint">
     <span>Keşfet</span>
@@ -1376,8 +1376,8 @@
   </div>
 </section>
 
-<!-- Audio via YouTube embed. For guaranteed no-ads playback, replace this with a direct audio file source. -->
-<iframe id="yt-player" src="https://www.youtube-nocookie.com/embed/aNQsM1trwPk?autoplay=0&loop=1&playlist=aNQsM1trwPk&mute=0&enablejsapi=1&rel=0&modestbranding=1&iv_load_policy=3&disablekb=1&playsinline=1" 
+<!-- Audio via YouTube privacy-enhanced embed. For guaranteed ad-free playback, use a direct audio file. -->
+<iframe id="yt-player" src="https://www.youtube-nocookie.com/embed/aNQsM1trwPk?autoplay=0&loop=1&playlist=aNQsM1trwPk&mute=0&enablejsapi=1&rel=0&modestbranding=1&iv_load_policy=3&disablekb=1&playsinline=1&controls=0" 
   style="position:fixed;width:1px;height:1px;opacity:0;bottom:0;left:0;pointer-events:none;" 
   allow="autoplay; encrypted-media" frameborder="0"></iframe>
 
@@ -1439,24 +1439,26 @@ let musicStarted = false;
 let musicMuted = false;
 const musicPopup = document.getElementById('music-popup');
 const musicStatus = document.querySelector('.music-info');
+const musicVideoId = 'aNQsM1trwPk';
 
-function sendPlayerCommand(func) {
+function sendPlayerCommand(func, args = []) {
   const iframe = document.getElementById('yt-player');
   if (!iframe || !iframe.contentWindow) return;
   iframe.contentWindow.postMessage(JSON.stringify({
     event: 'command',
     func,
-    args: ''
+    args
   }), '*');
 }
 
 function startMusic() {
   const iframe = document.getElementById('yt-player');
-  if (!musicStarted && iframe.src.includes('autoplay=0')) {
-    iframe.src = iframe.src.replace('autoplay=0', 'autoplay=1');
+  if (!musicStarted) {
+    iframe.src = `https://www.youtube-nocookie.com/embed/${musicVideoId}?autoplay=1&loop=1&playlist=${musicVideoId}&mute=0&enablejsapi=1&rel=0&modestbranding=1&iv_load_policy=3&disablekb=1&playsinline=1&controls=0`;
   }
   musicStarted = true;
   musicMuted = false;
+  sendPlayerCommand('loadVideoById', [musicVideoId]);
   sendPlayerCommand('unMute');
   sendPlayerCommand('playVideo');
   setTimeout(() => {
@@ -1612,23 +1614,26 @@ function blowCandles() {
 }
 
 function createBirthdayBurst() {
-  const symbols = ['💕','💖','💗','🌹','✨','★','✦'];
+  const symbols = ['💕','💖','💗','💓','💞','🌹','✨','★','✦','✧','❀'];
   const centerX = window.innerWidth / 2;
-  const centerY = window.innerHeight / 2;
-  for (let i = 0; i < 90; i++) {
+  const centerY = window.innerHeight * 0.52;
+  for (let i = 0; i < 240; i++) {
     const pop = document.createElement('span');
     pop.className = 'birthday-pop';
     pop.textContent = symbols[Math.floor(Math.random() * symbols.length)];
-    pop.style.left = centerX + 'px';
-    pop.style.top = centerY + 'px';
-    pop.style.setProperty('--x', ((Math.random() - 0.5) * window.innerWidth * 0.9) + 'px');
-    pop.style.setProperty('--y', ((Math.random() - 0.8) * window.innerHeight * 0.75) + 'px');
+    pop.style.left = (centerX + ((Math.random() - 0.5) * 180)) + 'px';
+    pop.style.top = (centerY + ((Math.random() - 0.5) * 90)) + 'px';
+    pop.style.fontSize = (Math.random() * 20 + 16) + 'px';
+    pop.style.setProperty('--x', ((Math.random() - 0.5) * window.innerWidth * 1.25) + 'px');
+    pop.style.setProperty('--y', ((Math.random() - 0.82) * window.innerHeight * 1.05) + 'px');
     pop.style.setProperty('--r', ((Math.random() * 720) - 360) + 'deg');
-    pop.style.animationDelay = (Math.random() * 0.35) + 's';
+    pop.style.animationDelay = (Math.random() * 0.85) + 's';
     document.body.appendChild(pop);
-    setTimeout(() => pop.remove(), 3400);
+    setTimeout(() => pop.remove(), 4200);
   }
-  createParticleBurst();
+  for (let wave = 0; wave < 3; wave++) {
+    setTimeout(createParticleBurst, wave * 220);
+  }
 }
 
 // ===== PARTICLE CANVAS =====
