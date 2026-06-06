@@ -1376,10 +1376,7 @@
   </div>
 </section>
 
-<!-- Audio via YouTube privacy-enhanced embed. For guaranteed ad-free playback, use a direct audio file. -->
-<iframe id="yt-player" src="https://www.youtube-nocookie.com/embed/aNQsM1trwPk?autoplay=0&loop=1&playlist=aNQsM1trwPk&mute=0&enablejsapi=1&rel=0&modestbranding=1&iv_load_policy=3&disablekb=1&playsinline=1&controls=0" 
-  style="position:fixed;width:1px;height:1px;opacity:0;bottom:0;left:0;pointer-events:none;" 
-  allow="autoplay; encrypted-media" frameborder="0"></iframe>
+<audio id="music-player" src="song.mp3" preload="auto" loop playsinline></audio>
 
 <script>
 // ===== CURSOR =====
@@ -1439,34 +1436,20 @@ let musicStarted = false;
 let musicMuted = false;
 const musicPopup = document.getElementById('music-popup');
 const musicStatus = document.querySelector('.music-info');
-const musicVideoId = 'aNQsM1trwPk';
+const musicPlayer = document.getElementById('music-player');
 
-function sendPlayerCommand(func, args = []) {
-  const iframe = document.getElementById('yt-player');
-  if (!iframe || !iframe.contentWindow) return;
-  iframe.contentWindow.postMessage(JSON.stringify({
-    event: 'command',
-    func,
-    args
-  }), '*');
-}
-
-function startMusic() {
-  const iframe = document.getElementById('yt-player');
-  if (!musicStarted) {
-    iframe.src = `https://www.youtube-nocookie.com/embed/${musicVideoId}?autoplay=1&loop=1&playlist=${musicVideoId}&mute=0&enablejsapi=1&rel=0&modestbranding=1&iv_load_policy=3&disablekb=1&playsinline=1&controls=0`;
+async function startMusic() {
+  try {
+    musicPlayer.muted = false;
+    await musicPlayer.play();
+    musicStarted = true;
+    musicMuted = false;
+    closeMusicPopup();
+    updateMusicUi();
+  } catch (error) {
+    musicStatus.textContent = 'Şarkı dosyası bulunamadı';
+    musicPopup.classList.remove('hidden');
   }
-  musicStarted = true;
-  musicMuted = false;
-  sendPlayerCommand('loadVideoById', [musicVideoId]);
-  sendPlayerCommand('unMute');
-  sendPlayerCommand('playVideo');
-  setTimeout(() => {
-    sendPlayerCommand('unMute');
-    sendPlayerCommand('playVideo');
-  }, 700);
-  closeMusicPopup();
-  updateMusicUi();
 }
 
 function closeMusicPopup() {
@@ -1479,7 +1462,7 @@ function toggleMute() {
     return;
   }
   musicMuted = !musicMuted;
-  sendPlayerCommand(musicMuted ? 'mute' : 'unMute');
+  musicPlayer.muted = musicMuted;
   updateMusicUi();
 }
 

@@ -1,0 +1,5 @@
+node_modules/
+dist/
+*.part
+*.mp3
+song.mp3
